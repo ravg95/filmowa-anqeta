@@ -1,1 +1,1 @@
-web: gunicorn filmowa_anqeta.wsgi
+web: gunicorn -w 4 wsgi:app
