@@ -1,0 +1,13 @@
+first create virtual enviroment in this directory and enter it (install virtualenv)
+to create virtual env:
+`virtualenv venv`
+ad enter it
+`source venv/bin/activate`
+
+
+The install all requirements
+
+`pip install -r requirements.txt`
+
+To start the app run gunicorn
+`gunicorn wsgi:app`
