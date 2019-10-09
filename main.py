@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 import sys
 import json
 from flask_heroku import Heroku
-
+import hashlib
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -11,15 +11,29 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://isizkblnwvttxv:80a74f78b2dfa
 heroku = Heroku(app)
 db = SQLAlchemy(app)
 db.init_app(app)
-from models import Movie, Session, Rating
+from models import Movie, User, Rating
 
-sessionID = 44
+sessionID = -1
+
+def ensure_cookie():
+    global sessionID
+    cook = request.cookies.get('sessionID')
+    if cook is not None:
+        sessionID = cook
+    elif sessionID is -1:
+        sessionID = str(User.query.count() + 1)
+        sessionID = hashlib.md5(sessionID.encode()).hexdigest()
+        db.session.add(User(sessionID))
+        db.session.commit()
+
 
 
 @app.route("/")
 def home():
+    ensure_cookie()
     resp = make_response(render_template("index.html"))
     resp.set_cookie('sessionID', sessionID)
+    #
     #rtg = Session(561)
     #db.session.add(rtg)
     #db.session.commit()
@@ -27,12 +41,14 @@ def home():
 
 @app.route("/test")
 def test():
-    return render_template("test.html")
+    ensure_cookie()
+    mov = Movie.query.get(1)
+    resp = make_response(render_template("test.html", mov_id = mov.tmdb_id))
+    resp.set_cookie('sessionID', sessionID)
+    return resp
 
-@app.route('/getcookie')
-def getcookie():
-   id = request.cookies.get('sessionID')
-   return "<h1>"+ str(id) + "</h1>"
+
+
 
 
 if __name__ == "__main__":

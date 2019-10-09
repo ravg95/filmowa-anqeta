@@ -1,9 +1,9 @@
 from flask_appbuilder import Model
-from sqlalchemy import Column, ForeignKey, Integer, String
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, ForeignKey, Integer, String, DateTime
+import datetime
 from main import db
 
-class Movie(Model):
+class Movie(db.Model):
     __tablename__ = "movies"
     id = db.Column(db.Integer, primary_key=True)
     tmdb_id = db.Column(db.Integer)
@@ -17,7 +17,7 @@ class Movie(Model):
     def __repr__(self):
         return "%s (%s): %s" % (self.id, self.tmdb_id, self.title)
 
-class Rating(Model):
+class Rating(db.Model):
     __tablename__ = "rating"
     id =  db.Column(db.Integer,primary_key=True)
     session_id = db.Column(db.Text(), db.ForeignKey('session.session_id'))
@@ -33,9 +33,10 @@ class Rating(Model):
         return "User %s rated film %s : %s" % (self.session, self.movie_id, self.rating)
 
 
-class Session(Model):
+class User(db.Model):
     __tablename__ = "session"
     session_id = db.Column(db.Text(), primary_key=True)
+    created_date = Column(DateTime, default=datetime.datetime.utcnow)
 
     def __init__(self, id):
         self.session_id = id
