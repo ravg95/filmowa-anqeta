@@ -5,11 +5,15 @@
     {% block content %}
    <main role="main" class="inner cover">
       <h1 class="cover-heading">This is test.</h1>
-    <p>Tu ma byc pięć boksów z filmami i ocenkami i cos do przelaczenia na kolejny/poprzedni zestaw 5 filmow</p>
-
-      {% if mov_id %}
-        <p>Film id: {{mov_id}}</p>
-      {% endif %}
+      <table>
+         <tr>
+           {% for movie in movies %}
+                  <th>
+                    <td>Title: {{movie}}</td>
+                  </th>
+            {% endfor %}
+        </tr>
+      </table>
     </main>
     {% endblock %}
 </body>

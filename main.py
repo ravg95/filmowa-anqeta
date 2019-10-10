@@ -4,6 +4,11 @@ import sys
 import json
 from flask_heroku import Heroku
 import hashlib
+import tmdbsimple as tmdb
+
+tmdb.API_KEY = 'b5e95273c3bc67794bffa473d3439747'
+
+poster_path= "https://image.tmdb.org/t/p/original/"
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -33,17 +38,19 @@ def home():
     ensure_cookie()
     resp = make_response(render_template("index.html"))
     resp.set_cookie('sessionID', sessionID)
-    #
-    #rtg = Session(561)
-    #db.session.add(rtg)
-    #db.session.commit()
     return resp
 
 @app.route("/test")
 def test():
     ensure_cookie()
-    mov = Movie.query.get(1)
-    resp = make_response(render_template("test.html", mov_id = mov.tmdb_id))
+    i=2
+    movie = []
+    for j in range(5):
+        mv = tmdb.Movies(Movie.query.get(5*i+1+j))
+        response = mv.info()
+        movie.append(mv.title)
+        #movie[j].info()
+    resp = make_response(render_template("test.html", movies = movie))
     resp.set_cookie('sessionID', sessionID)
     return resp
 
