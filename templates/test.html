@@ -5,15 +5,26 @@
     {% block content %}
    <main role="main" class="inner cover">
       <h1 class="cover-heading">This is test.</h1>
-      <table>
-         <tr>
+      <div>
            {% for movie in movies %}
-                  <th>
-                    <td>Title: {{movie}}</td>
-                  </th>
+           <div>
+                  <p>
+                    <h1>Title: {{movie.title}}</h1>
+                    <h3>Original: {{movie.original_title}}</h3>
+                    <!--
+                    class movie:
+                      id: int
+                      title:  str
+                      image_src: str
+                      original_title: str
+                      overview: str
+                      release_date: str
+                    -->
+                  </p>
+                  <img src={{movie.image_src}} width = 100>
+            <div>
             {% endfor %}
-        </tr>
-      </table>
+      </div>
     </main>
     {% endblock %}
 </body>

@@ -43,20 +43,31 @@ def home():
 @app.route("/test")
 def test():
     ensure_cookie()
-    i=2
-    movie = []
+    i=0
+    movies = []
     for j in range(5):
-        mv = tmdb.Movies(Movie.query.get(5*i+1+j))
+        mv = tmdb.Movies(Movie.query.get(5*i+1+j).tmdb_id)
         response = mv.info()
-        movie.append(mv.title)
-        #movie[j].info()
-    resp = make_response(render_template("test.html", movies = movie))
+        movies.append(MovieInfo(5*i+1+j, mv.title, poster_path + mv.poster_path, mv.original_title, mv.overview, mv.release_date))
+
+    resp = make_response(render_template("test.html", movies = movies))
     resp.set_cookie('sessionID', sessionID)
     return resp
 
-
-
-
+class MovieInfo:
+    id: int
+    title:  str
+    image_src: str
+    original_title: str
+    overview: str
+    release_date: str
+    def __init__(self, id, title, image_src, original_title, overview, release_date):
+        self.id = id
+        self.title = title
+        self.image_src = image_src
+        self.original_title = original_title
+        self.overview = overview
+        self.release_date = release_date
 
 if __name__ == "__main__":
     app.run(debug=True)
