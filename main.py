@@ -29,8 +29,8 @@ cookieId = -1
 @app.route("/user", methods = ['GET'])
 def user():
     global cookieId
-    cookieId = request.headers.get('Authorization')
-
+    #cookieId = request.headers.get('Authorization')
+    cookieId = request.cookies.get('sessionID')
     ww = User.query.filter(User.session_id.match(cookieId)).first()
     if ww is None:
         db.session.add(User(cookieId))
@@ -53,10 +53,10 @@ def getMovie(id):
     response = mv.info()
     prevId = id - 1
     if prevId < 1:
-        prevId = 'null'
+        prevId = None
     nextId = id + 1
     if nextId > 200:
-        nextId = 'null'
+        nextId = None
     resp2 = mv.credits()
     drs = [credit for credit in mv.crew if credit["job"] == "Director"]
     directors = []
@@ -70,7 +70,7 @@ def getMovie(id):
     if hasVoted:
         vote = row.rating
     else:
-        vote = "null"
+        vote = None
 
     d = {
       'title': mv.title,
