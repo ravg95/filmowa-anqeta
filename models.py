@@ -30,7 +30,7 @@ class Rating(db.Model):
         self.rating = rating
 
     def __repr__(self):
-        return "User %s rated film %s : %s" % (self.session, self.movie_id, self.rating)
+        return "User %s rated film %s : %s" % (self.session_id, self.movie_id, self.rating)
 
 
 class User(db.Model):
