@@ -29,8 +29,8 @@ cookieId = -1
 @app.route("/user", methods = ['GET'])
 def user():
     global cookieId
-    #cookieId = request.headers.get('Authorization')
-    cookieId = request.cookies.get('sessionID')
+    cookieId = request.headers.get('Authorization')
+    #cookieId = request.cookies.get('sessionID')
     ww = User.query.filter(User.session_id.match(cookieId)).first()
     if ww is None:
         db.session.add(User(cookieId))
