@@ -54,6 +54,7 @@ def user():
 @cross_origin()
 def getMovie(id):
     cookieId = request.headers.get('Authorization')
+    #cookieId = '18baab70-ef36-11e9-af39-f94d7c840094'
     mv = tmdb.Movies(Movie.query.get(id).tmdb_id)
     response = mv.info()
     prevId = id - 1
@@ -77,6 +78,8 @@ def getMovie(id):
     else:
         vote = None
 
+    cnt = Rating.query.filter_by(session_id = cookieId).count()
+
     d = {
       'title': mv.title,
       'plot': mv.overview,
@@ -91,7 +94,8 @@ def getMovie(id):
       nextMovieId = nextId,
       currentMovieId = id,
       previousMovieId = prevId,
-      movie = d
+      movie = d,
+      ratedMoviesCount = cnt
     )
 
 
