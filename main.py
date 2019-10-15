@@ -5,6 +5,7 @@ import sys
 import json
 from flask import jsonify
 from flask_heroku import Heroku
+from flask_cors import CORS, cross_origin
 import tmdbsimple as tmdb
 
 tmdb.API_KEY = 'b5e95273c3bc67794bffa473d3439747'
@@ -20,13 +21,15 @@ db = SQLAlchemy(app)
 db.init_app(app)
 from models import Movie, User, Rating
 
-
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 
 cookieId = -1
 
 
 
 @app.route("/user", methods = ['GET'])
+@cross_origin()
 def user():
     global cookieId
     cookieId = request.headers.get('Authorization')
@@ -48,6 +51,7 @@ def user():
 
 
 @app.route("/movie/<int:id>", methods = ['GET'])
+@cross_origin()
 def getMovie(id):
     mv = tmdb.Movies(Movie.query.get(id).tmdb_id)
     response = mv.info()
@@ -91,6 +95,7 @@ def getMovie(id):
 
 
 @app.route("/movie/<int:id>/vote", methods = ['PUT'])
+@cross_origin()
 def vote(id):
     json_data = request.get_json()
     vote = json_data['vote']
