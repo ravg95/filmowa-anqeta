@@ -53,6 +53,7 @@ def user():
 @app.route("/movie/<int:id>", methods = ['GET'])
 @cross_origin()
 def getMovie(id):
+    cookieId = request.headers.get('Authorization')
     mv = tmdb.Movies(Movie.query.get(id).tmdb_id)
     response = mv.info()
     prevId = id - 1
