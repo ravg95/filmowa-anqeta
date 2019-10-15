@@ -26,6 +26,14 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 
 cookieId = -1
 
+def checkUser(cookie):
+    ww = User.query.filter(User.session_id.match(cookie)).first()
+    if ww is None:
+        db.session.add(User(cookie))
+        db.session.commit()
+        return True
+    else:
+        return False
 
 
 @app.route("/user", methods = ['GET'])
@@ -33,20 +41,17 @@ cookieId = -1
 def user():
     global cookieId
     cookieId = request.headers.get('Authorization')
-
-    ww = User.query.filter(User.session_id.match(cookieId)).first()
-    if ww is None:
-        db.session.add(User(cookieId))
-        db.session.commit()
+    #cookieId = '18baab70-ef36-11e9-af39-f94d7c840094'
+    if checkUser(cookieId):
         return jsonify(
             firstMovieId = 1,
             nextMovieId = 1
         )
     else:
-        mov = db.session.query(func.max(Rating.movie_id).filter(Rating.session_id==str(ww))).one()[0]
+        mov = db.session.query(func.max(Rating.movie_id).filter(Rating.session_id==cookieId)).one()[0]
         return jsonify(
             firstMovieId = 1,
-            nextMovieId = mov
+            nextMovieId = mov + 1
         )
 
 
@@ -55,6 +60,7 @@ def user():
 def getMovie(id):
     cookieId = request.headers.get('Authorization')
     #cookieId = '18baab70-ef36-11e9-af39-f94d7c840094'
+    checkUser(cookieId)
     mv = tmdb.Movies(Movie.query.get(id).tmdb_id)
     response = mv.info()
     prevId = id - 1
@@ -104,10 +110,19 @@ def getMovie(id):
 def vote(id):
     cookieId = request.headers.get('Authorization')
     #cookieId = '18baab70-ef36-11e9-af39-f94d7c840094'
+    checkUser(cookieId)
     json_data = request.get_json()
     vote = json_data['vote']
-    db.session.add(Rating(cookieId, id, vote))
+    row = Rating.query.filter_by(session_id = cookieId, movie_id = id).first()
+    hasVoted = (row != None)
+    rating = Rating(cookieId, id, vote)
+    if hasVoted:
+        db.session.delete(row)
+        db.session.commit()
+
+    db.session.add(rating)
     db.session.commit()
+    return ""
 
 
 
