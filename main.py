@@ -24,7 +24,7 @@ from models import Movie, User, Rating
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
-cookieId = -1
+cookieId = "2h2h722"
 
 
 
@@ -32,8 +32,8 @@ cookieId = -1
 @cross_origin()
 def user():
     global cookieId
-    cookieId = request.headers.get('Authorization')
-    #cookieId = request.cookies.get('sessionID')
+    #cookieId = request.headers.get('Authorization')
+    cookieId = "undefined"
     ww = User.query.filter(User.session_id.match(cookieId)).first()
     if ww is None:
         db.session.add(User(cookieId))
@@ -43,7 +43,7 @@ def user():
             nextMovieId = 1
         )
     else:
-        mov = db.session.query(func.max(Rating.movie_id).filter(Rating.session_id==str(ww))).one()
+        mov = db.session.query(func.max(Rating.movie_id).filter(Rating.session_id==str(ww))).one()[0]
         return jsonify(
             firstMovieId = 1,
             nextMovieId = mov
