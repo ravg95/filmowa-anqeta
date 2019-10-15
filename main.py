@@ -24,7 +24,7 @@ from models import Movie, User, Rating
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
-cookieId = "2h2h722"
+cookieId = -1
 
 
 
@@ -32,8 +32,8 @@ cookieId = "2h2h722"
 @cross_origin()
 def user():
     global cookieId
-    #cookieId = request.headers.get('Authorization')
-    cookieId = "undefined"
+    cookieId = request.headers.get('Authorization')
+
     ww = User.query.filter(User.session_id.match(cookieId)).first()
     if ww is None:
         db.session.add(User(cookieId))
