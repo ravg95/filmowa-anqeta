@@ -103,11 +103,11 @@ def getMovie(id):
 @cross_origin()
 def vote(id):
     cookieId = request.headers.get('Authorization')
+    #cookieId = '18baab70-ef36-11e9-af39-f94d7c840094'
     json_data = request.get_json()
     vote = json_data['vote']
     db.session.add(Rating(cookieId, id, vote))
     db.session.commit()
-
 
 
 
