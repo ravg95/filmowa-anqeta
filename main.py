@@ -40,8 +40,8 @@ def checkUser(cookie):
 @cross_origin()
 def user():
     global cookieId
-    cookieId = request.headers.get('Authorization')
-    #cookieId = '18baab70-ef36-11e9-af39-f94d7c840094'
+    #cookieId = request.headers.get('Authorization')
+    cookieId = '18baab70-ef36-11e9-af39-f94d7c840094'
     if checkUser(cookieId):
         return jsonify(
             firstMovieId = 1,
@@ -58,8 +58,8 @@ def user():
 @app.route("/movie/<int:id>", methods = ['GET'])
 @cross_origin()
 def getMovie(id):
-    cookieId = request.headers.get('Authorization')
-    #cookieId = '18baab70-ef36-11e9-af39-f94d7c840094'
+    #cookieId = request.headers.get('Authorization')
+    cookieId = '18baab70-ef36-11e9-af39-f94d7c840094'
     checkUser(cookieId)
     mv = tmdb.Movies(Movie.query.get(id).tmdb_id)
     response = mv.info()
@@ -108,20 +108,20 @@ def getMovie(id):
 @app.route("/movie/<int:id>/vote", methods = ['POST'])
 @cross_origin()
 def vote(id):
-    cookieId = request.headers.get('Authorization')
-    #cookieId = '18baab70-ef36-11e9-af39-f94d7c840094'
+    #cookieId = request.headers.get('Authorization')
+    cookieId = '18baab70-ef36-11e9-af39-f94d7c840094'
     checkUser(cookieId)
     json_data = request.get_json()
     vote = json_data['vote']
     row = Rating.query.filter_by(session_id = cookieId, movie_id = id).first()
     hasVoted = (row != None)
-    rating = Rating(cookieId, id, vote)
     if hasVoted:
-        db.session.delete(row)
+        row.rating = vote
         db.session.commit()
-
-    db.session.add(rating)
-    db.session.commit()
+    else:
+        rating = Rating(cookieId, id, vote)
+        db.session.add(rating)
+        db.session.commit()
     return ""
 
 
