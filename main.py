@@ -95,9 +95,10 @@ def getMovie(id):
     )
 
 
-@app.route("/movie/<int:id>/vote", methods = ['PUT'])
+@app.route("/movie/<int:id>/vote", methods = ['POST'])
 @cross_origin()
 def vote(id):
+    cookieId = request.headers.get('Authorization')
     json_data = request.get_json()
     vote = json_data['vote']
     db.session.add(Rating(cookieId, id, vote))
