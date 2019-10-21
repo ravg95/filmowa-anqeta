@@ -6,6 +6,7 @@ import json
 from flask import jsonify
 from flask_heroku import Heroku
 from flask_cors import CORS, cross_origin
+from flask import abort
 import tmdbsimple as tmdb
 
 tmdb.API_KEY = 'b5e95273c3bc67794bffa473d3439747'
@@ -61,6 +62,9 @@ def getMovie(id):
     cookieId = request.headers.get('Authorization')
     #cookieId = '18baab70-ef36-11e9-af39-f94d7c840094'
     checkUser(cookieId)
+    mov = db.session.query(func.max(Rating.movie_id).filter(Rating.session_id==cookieId)).one()[0]
+    if (mov is not None and id > mov+1) or (mov is None and id > 1):
+        abort(404)
     mv = tmdb.Movies(Movie.query.get(id).tmdb_id)
     response = mv.info()
     prevId = id - 1
@@ -111,7 +115,7 @@ def vote(id):
     cookieId = request.headers.get('Authorization')
     #cookieId = '18baab70-ef36-11e9-af39-f94d7c840094'
     checkUser(cookieId)
-    json_data = request.get_json()
+    json_data = request.get_json(force=True)
     vote = json_data['vote']
     row = Rating.query.filter_by(session_id = cookieId, movie_id = id).first()
     hasVoted = (row != None)
