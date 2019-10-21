@@ -7,10 +7,8 @@ from flask import jsonify
 from flask_heroku import Heroku
 from flask_cors import CORS, cross_origin
 from flask import abort
-import tmdbsimple as tmdb
 import os
 db_url = os.environ.get('DATABASE_URL')
-tmdb.API_KEY = 'b5e95273c3bc67794bffa473d3439747'
 
 poster_path= "https://image.tmdb.org/t/p/original"
 imdb_path = "https://www.imdb.com/title/"
@@ -21,12 +19,11 @@ app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 heroku = Heroku(app)
 db = SQLAlchemy(app)
 db.init_app(app)
-from models import Movie, User, Rating
+from models import Movie, User, Rating, MovieInfo
 
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
-cookieId = -1
 
 def checkUser(cookie):
     ww = User.query.filter(User.session_id.match(cookie)).first()
@@ -44,7 +41,6 @@ def main():
 @app.route("/user", methods = ['GET'])
 @cross_origin()
 def user():
-    global cookieId
     cookieId = request.headers.get('Authorization')
     #cookieId = '18baab70-ef36-11e9-af39-f94d7c840094'
     if checkUser(cookieId):
@@ -71,22 +67,14 @@ def getMovie(id):
     mov = db.session.query(func.max(Rating.movie_id).filter(Rating.session_id==cookieId)).one()[0]
     if (mov is not None and id > mov+1) or (mov is None and id > 1):
         abort(404)
-    mv = tmdb.Movies(Movie.query.get(id).tmdb_id)
-    response = mv.info(language="pl")
+    mv = MovieInfo.query.get(id)
     prevId = id - 1
     if prevId < 1:
         prevId = None
     nextId = id + 1
     if nextId > 200:
         nextId = None
-    resp2 = mv.credits(language="pl")
-    drs = [credit for credit in mv.crew if credit["job"] == "Director"]
-    directors = []
-    for dr in drs:
-        directors.append(dr['name'])
-    actors = []
-    for actor in mv.cast[0:3]:
-        actors.append(actor['name'])
+
     row = Rating.query.filter_by(session_id = cookieId, movie_id = id).first()
     hasVoted = (row != None)
     if hasVoted:
@@ -95,15 +83,14 @@ def getMovie(id):
         vote = None
 
     cnt = Rating.query.filter_by(session_id = cookieId).count()
-
     d = {
       'title': mv.title,
       'original_title': mv.original_title,
-      'plot': mv.overview,
-      'director': directors,
-      'actors': actors,
-      'imdb_url': imdb_path + mv.imdb_id,
-      'poster_url': poster_path + mv.poster_path,
+      'plot': mv.plot,
+      'director': mv.director,
+      'actors': mv.actors,
+      'imdb_url': mv.imdb_url,
+      'poster_url': mv.poster_url,
       'hasVoted': hasVoted,
       'vote': vote
     }

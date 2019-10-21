@@ -1,5 +1,5 @@
 from flask_appbuilder import Model
-from sqlalchemy import Column, ForeignKey, Integer, String, DateTime
+from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, UniqueConstraint
 import datetime
 from main import db
 
@@ -20,9 +20,10 @@ class Movie(db.Model):
 class Rating(db.Model):
     __tablename__ = "rating"
     id =  db.Column(db.Integer,primary_key=True)
-    session_id = db.Column(db.Text(), db.ForeignKey('session.session_id'))
-    movie_id = db.Column(db.Integer, db.ForeignKey('movies.id') )
-    rating = db.Column(db.Integer)
+    session_id = db.Column(db.Text(), db.ForeignKey('session.session_id'), nullable=False)
+    movie_id = db.Column(db.Integer, db.ForeignKey('movies.id') ,nullable=False)
+    rating = db.Column(db.Integer, nullable=True)
+    __table_args__ = (UniqueConstraint('session_id', 'movie_id', name='unik'),)
 
     def __init__(self, session, mov_id, rating):
         self.session_id = session
@@ -59,7 +60,7 @@ class MovieInfo(db.Model):
         self.id = id
         self.title = title
         self.original_title = original_title
-        self. plot = plot
+        self.plot = plot
         self.director = director
         self.actors = actors
         self.imdb_url = imdb_url
