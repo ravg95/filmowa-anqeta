@@ -46,13 +46,15 @@ def user():
     if checkUser(cookieId):
         return jsonify(
             firstMovieId = 1,
-            nextMovieId = 1
+            nextMovieId = None
         )
     else:
         mov = db.session.query(func.max(Rating.movie_id).filter(Rating.session_id==cookieId)).one()[0]
+        if mov is not None:
+            mov +=1
         return jsonify(
             firstMovieId = 1,
-            nextMovieId = mov + 1
+            nextMovieId = mov
         )
 
 
