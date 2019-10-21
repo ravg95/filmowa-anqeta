@@ -8,7 +8,8 @@ from flask_heroku import Heroku
 from flask_cors import CORS, cross_origin
 from flask import abort
 import tmdbsimple as tmdb
-
+import os
+db_url = os.environ.get('DATABASE_URL')
 tmdb.API_KEY = 'b5e95273c3bc67794bffa473d3439747'
 
 poster_path= "https://image.tmdb.org/t/p/original"
@@ -16,7 +17,7 @@ imdb_path = "https://www.imdb.com/title/"
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://isizkblnwvttxv:80a74f78b2dfac445eb358f05e6eb65ba1ae28c811b610ab3f2b6930d7d38a3d@ec2-54-247-171-30.eu-west-1.compute.amazonaws.com:5432/de5c5roa45c8e0'
+app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 heroku = Heroku(app)
 db = SQLAlchemy(app)
 db.init_app(app)
@@ -35,7 +36,10 @@ def checkUser(cookie):
         return True
     else:
         return False
-
+@app.route("/")
+@cross_origin()
+def main():
+    return str(db_url)
 
 @app.route("/user", methods = ['GET'])
 @cross_origin()
@@ -68,14 +72,14 @@ def getMovie(id):
     if (mov is not None and id > mov+1) or (mov is None and id > 1):
         abort(404)
     mv = tmdb.Movies(Movie.query.get(id).tmdb_id)
-    response = mv.info()
+    response = mv.info(language="pl")
     prevId = id - 1
     if prevId < 1:
         prevId = None
     nextId = id + 1
     if nextId > 200:
         nextId = None
-    resp2 = mv.credits()
+    resp2 = mv.credits(language="pl")
     drs = [credit for credit in mv.crew if credit["job"] == "Director"]
     directors = []
     for dr in drs:
@@ -94,6 +98,7 @@ def getMovie(id):
 
     d = {
       'title': mv.title,
+      'original_title': mv.original_title,
       'plot': mv.overview,
       'director': directors,
       'actors': actors,
