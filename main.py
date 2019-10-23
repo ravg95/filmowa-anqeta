@@ -19,7 +19,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 heroku = Heroku(app)
 db = SQLAlchemy(app)
 db.init_app(app)
-from models import Movie, User, Rating, MovieInfo
+from models import User, Rating, MovieInfo
 
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
@@ -33,10 +33,7 @@ def checkUser(cookie):
         return True
     else:
         return False
-@app.route("/")
-@cross_origin()
-def main():
-    return str(db_url)
+
 
 @app.route("/user", methods = ['GET'])
 @cross_origin()
@@ -125,4 +122,4 @@ def vote(id):
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()
