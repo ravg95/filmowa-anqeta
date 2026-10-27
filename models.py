@@ -1,15 +1,17 @@
-from flask_appbuilder import Model
-from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, UniqueConstraint
 import datetime
+
+from sqlalchemy import Column, DateTime, UniqueConstraint
+
 from main import db
+
 
 class Rating(db.Model):
     __tablename__ = "rating"
-    id =  db.Column(db.Integer,primary_key=True)
-    session_id = db.Column(db.Text(), db.ForeignKey('session.session_id'), nullable=False)
-    movie_id = db.Column(db.Integer, db.ForeignKey('info.id') ,nullable=False)
+    id = db.Column(db.Integer, primary_key=True)
+    session_id = db.Column(db.Text(), db.ForeignKey("session.session_id"), nullable=False)
+    movie_id = db.Column(db.Integer, db.ForeignKey("info.id"), nullable=False)
     rating = db.Column(db.Integer, nullable=True)
-    __table_args__ = (UniqueConstraint('session_id', 'movie_id', name='unik'),)
+    __table_args__ = (UniqueConstraint("session_id", "movie_id", name="unik"),)
 
     def __init__(self, session, mov_id, rating):
         self.session_id = session
@@ -17,7 +19,7 @@ class Rating(db.Model):
         self.rating = rating
 
     def __repr__(self):
-        return "User %s rated film %s : %s" % (self.session_id, self.movie_id, self.rating)
+        return f"User {self.session_id} rated film {self.movie_id} : {self.rating}"
 
 
 class User(db.Model):
@@ -29,18 +31,19 @@ class User(db.Model):
         self.session_id = id
 
     def __repr__(self):
-        return "%s" % (self.session_id)
+        return str(self.session_id)
+
 
 class MovieInfo(db.Model):
     __tablename__ = "info"
     id = db.Column(db.Integer, primary_key=True)
-    title=  db.Column(db.Text())
-    original_title=  db.Column(db.Text())
-    plot=  db.Column(db.Text())
-    director=  db.Column(db.Text())
-    actors=  db.Column(db.Text())
-    imdb_url=  db.Column(db.Text())
-    poster_url=  db.Column(db.Text())
+    title = db.Column(db.Text())
+    original_title = db.Column(db.Text())
+    plot = db.Column(db.Text())
+    director = db.Column(db.Text())
+    actors = db.Column(db.Text())
+    imdb_url = db.Column(db.Text())
+    poster_url = db.Column(db.Text())
 
     def __init__(self, id, title, original_title, plot, director, actors, imdb_url, poster_url):
         self.id = id
