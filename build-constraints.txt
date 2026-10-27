@@ -1,0 +1,2 @@
+# Flask-OpenID 1.2.5 uses use_2to3, removed in setuptools 58
+setuptools<58

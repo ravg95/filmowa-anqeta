@@ -1,15 +1,22 @@
-first create virtual enviroment in this directory and enter it (install virtualenv)
-to create virtual env:
+Requirements: Python 3.8, uv (https://docs.astral.sh/uv/) and libpq headers
+(`apt install libpq-dev` / `brew install libpq`) to build psycopg2.
 
-`$ virtualenv venv`
+Create the virtual environment and install all requirements (app + dev tools):
 
-ad enter it
+`$ make install`
+
+Flask-OpenID needs setuptools<58 to build, which is why the install goes
+through `build-constraints.txt`.
+
+Enter the virtual environment:
+
 `$ source venv/bin/activate`
 
-
-The install all requirements
-
-`$ pip install -r requirements.txt`
-
-To start the app run gunicorn
+To start the app run gunicorn (needs DATABASE_URL)
 `$ gunicorn wsgi:app`
+
+Linting (ruff, configured in pyproject.toml):
+
+`$ make lint`    - run the linter
+`$ make format`  - auto-format and apply safe fixes
+`$ make check`   - lint + format check (no changes)
